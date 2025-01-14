@@ -1,5 +1,3 @@
-
-
 class Product:
 
     def __init__(self, name: str, price: float, quantity: int):
@@ -61,12 +59,45 @@ class Product:
         return total_price
 
 
+class NonStockedProduct(Product):
+    """A product that is not physical and does not track quantity."""
 
+    def __init__(self, name: str, price: float):
+        # Initialize with quantity set to zero
+        super().__init__(name, price, quantity=0)
+
+    def set_quantity(self, quantity: int):
+        """Override to ensure quantity cannot be changed."""
+        raise ValueError("Quantity cannot be set for non-stocked products.")
+
+    def show(self) -> str:
+        """Return a string representation of the non-stocked product."""
+        return f"{self.name} (Non-Stocked), Price: {self.price}"
+
+
+class LimitedProduct(Product):
+    """A product that has a maximum purchase limit per order."""
+
+    def __init__(self, name: str, price: float, quantity: int, maximum: int):
+        super().__init__(name, price, quantity)
+        self.maximum = maximum
+
+    def buy(self, quantity: int) -> float:
+        """Override to enforce maximum purchase limit."""
+        if quantity > self.maximum:
+            raise ValueError(f"Cannot purchase more than {self.maximum} of {self.name} in one order.")
+        return super().buy(quantity)
+
+    def show(self) -> str:
+        """Return a string representation of the limited product."""
+        return f"{self.name} (Limited to {self.maximum} per order), Price: {self.price}, Quantity: {self.quantity}"
 
 
 def main():
     bose = Product("Bose QuietComfort Earbuds", price=250, quantity=500)
     mac = Product("MacBook Air M2", price=1450, quantity=100)
+    windows = NonStockedProduct("Windows License", price=125)
+    shipping = LimitedProduct("Shipping", price=10, quantity=250, maximum=1)
 
     print(bose.buy(50))
     print(mac.buy(100))
@@ -74,6 +105,8 @@ def main():
 
     print(bose.show())
     print(mac.show())
+    print(windows.show())
+    print(shipping.show())
 
     bose.set_quantity(1000)
     print(bose.show())
