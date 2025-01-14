@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+
 class Product:
 
     def __init__(self, name: str, price: float, quantity: int):
@@ -12,7 +14,7 @@ class Product:
         self.price = price
         self.quantity = quantity
         self.active = True
-
+        self.promotion = None
 
     def get_quantity(self) -> float:
         """Returns the current quantity of the product."""
@@ -39,9 +41,15 @@ class Product:
         """Deactivate the product"""
         self.active = False
 
+    def set_promotion(self, promotion):
+        self.promotion = promotion
+
+    def get_promotion(self):
+        return self.promotion
+
     def show(self) -> str:
-        """Returns a string that represents the product."""
-        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}"
+        promotion_info = f" (Promotion: {self.promotion.name})" if self.promotion else ""
+        return f"{self.name}, Price: {self.price}, Quantity: {self.quantity}{promotion_info}"
 
     def buy(self, quantity: int) -> float:
         """Buys a given quantity of the product.
@@ -51,13 +59,50 @@ class Product:
         if quantity > self.quantity:
             raise ValueError("Not enough quantity available for purchase.")
 
-        total_price = self.price * quantity
+        if self.promotion:
+            total_price = self.promotion.apply_promotion(self, quantity)
+        else:
+            total_price = self.price * quantity
+
         self.quantity -= quantity
         if self.quantity == 0:
             self.deactivate()
 
         return total_price
 
+class Promotion(ABC):
+    def __init__(self, name: str):
+        self.name = name
+
+    @abstractmethod
+    def apply_promotion(self, product: Product, quantity: int) -> float:
+        pass
+
+class PercentageDiscount(Promotion):
+    def __init__(self, name: str, discount_percent: float):
+        super().__init__(name)
+        self.discount_percent = discount_percent
+
+    def apply_promotion(self, product: Product, quantity: int) -> float:
+        discount = product.price * (self.discount_percent / 100)
+        return (product.price - discount) * quantity
+
+class SecondItemHalfPrice(Promotion):
+    def __init__(self, name: str):
+        super().__init__(name)
+
+    def apply_promotion(self, product: Product, quantity: int) -> float:
+        full_price_items = quantity // 2 + quantity % 2
+        half_price_items = quantity // 2
+        return (full_price_items * product.price) + (half_price_items * product.price * 0.5)
+
+class BuyTwoGetOneFree(Promotion):
+    def __init__(self, name: str):
+        super().__init__(name)
+
+    def apply_promotion(self, product: Product, quantity: int) -> float:
+        paid_items = (quantity // 3) * 2 + (quantity % 3)
+        return paid_items * product.price
 
 class NonStockedProduct(Product):
     """A product that is not physical and does not track quantity."""
