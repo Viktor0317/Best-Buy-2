@@ -4,7 +4,7 @@
 ## Overview
 This is a project created as part of the Masterschool curriculum.
 
-The Best Buy Store Management System is a Python-based application for managing store inventory, processing customer orders, and applying promotional discounts. Designed with object-oriented principles, it provides a flexible and extensible structure for handling various types of products and promotions.
+The Best Buy 2 Store Management System is a Python-based application for managing store inventory, processing customer orders, and applying promotional discounts. Designed with object-oriented principles, it provides a flexible and extensible structure for handling various types of products and promotions.
 
 ---
 
