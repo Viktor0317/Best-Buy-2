@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import Optional  # Used to indicate that a variable can be of a specified type or None
 
 class Product:
 
